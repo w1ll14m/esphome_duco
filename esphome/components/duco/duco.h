@@ -135,6 +135,7 @@ class DucoDiscovery : public DucoDevice, public PollingComponent {
   static const std::string NODE_TYPE_UCCO2;
   static const std::string NODE_TYPE_VLV;
   static const std::string NODE_TYPE_VLVRH;
+  static const std::string NODE_TYPE_VLVCO2;
   static const std::string NODE_TYPE_BOX;
   static const std::string NODE_TYPE_SWITCH;
   static const std::string NODE_TYPE_UNKNOWN;
@@ -145,6 +146,7 @@ class DucoDiscovery : public DucoDevice, public PollingComponent {
   static const uint8_t NODE_TYPE_CODE_UCCO2 = 12;
   static const uint8_t NODE_TYPE_CODE_VLV = 13;
   static const uint8_t NODE_TYPE_CODE_VLVRH = 14;
+  static const uint8_t NODE_TYPE_CODE_VLVCO2 = 16;
   static const uint8_t NODE_TYPE_CODE_BOX = 17;
   static const uint8_t NODE_TYPE_CODE_SWITCH = 18;
 
