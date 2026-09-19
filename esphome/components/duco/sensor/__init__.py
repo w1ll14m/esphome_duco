@@ -128,7 +128,7 @@ CONFIG_SCHEMA = cv.Schema(
             .extend(
                 {
                     cv.GenerateID(): cv.declare_id(DucoUptimeSensor),
-                    cv.Required(CONF_ADDRESS): cv.int_range(0, 68),
+                    cv.Optional(CONF_ADDRESS): cv.int_range(0, 68),
                 }
             )
             .extend(cv.polling_component_schema("60s"))
@@ -234,7 +234,10 @@ async def to_code(config):
             await cg.register_component(sensvar, uptime_sensor_config)
             await sensor.register_sensor(sensvar, uptime_sensor_config)
             cg.add(sensvar.set_parent(parent))
-            cg.add(sensvar.set_address(uptime_sensor_config[CONF_ADDRESS]))
+            if CONF_ADDRESS in uptime_sensor_config:
+                cg.add(sensvar.set_address(uptime_sensor_config[CONF_ADDRESS]))
+            else:
+                cg.add(sensvar.set_address(1))
 
     if CONF_FILTER_REMAINING in config:
         filter_remaining_config = config[CONF_FILTER_REMAINING]
