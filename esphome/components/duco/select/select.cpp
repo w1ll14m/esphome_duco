@@ -29,11 +29,11 @@ const std::string DucoBypassControl::BYPASS_CLOSED = "CLOSED";
 const std::string DucoBypassAdaptiveControl::BYPASS_ADAPTIVE_ON = "ON";
 const std::string DucoBypassAdaptiveControl::BYPASS_ADAPTIVE_OFF = "OFF";
 
-const std::string DucoHeaterMode::HEATER_ON  = "ON";
-const std::string DucoHeaterMode::HEATER_OFF  = "OFF";
+const std::string DucoHeaterMode::HEATER_ALLOW  = "ALLOW";
+const std::string DucoHeaterMode::HEATER_REFUSE  = "REFUSE";
 
 const std::string DucoPassiveCooling::PASSIVE_COOLING_ON = "ON";
-const std::string DucoPassiveCooling::PASSIVE_COOLING_OFF = "ON";
+const std::string DucoPassiveCooling::PASSIVE_COOLING_OFF = "OFF";
 
 const uint8_t DucoSelect::MODE_CODE_AUTO = 0x00;
 const uint8_t DucoSelect::MODE_CODE_MAN1 = 0x04;
@@ -57,8 +57,8 @@ const uint8_t DucoBypassControl::BYPASS_CODE_CLOSED = 0x01;
 const uint8_t DucoBypassAdaptiveControl::BYPASS_ADAPTIVE_CODE_ON = 0x01;
 const uint8_t DucoBypassAdaptiveControl::BYPASS_ADAPTIVE_CODE_OFF = 0x00;
 
-const uint8_t DucoHeaterMode::HEATER_CODE_ON = 0x01;
-const uint8_t DucoHeaterMode::HEATER_CODE_OFF = 0x00;
+const uint8_t DucoHeaterMode::HEATER_CODE_ALLOW = 0x01;
+const uint8_t DucoHeaterMode::HEATER_CODE_REFUSE = 0x00;
 
 const uint8_t DucoPassiveCooling::PASSIVE_COOLING_CODE_ON = 0x00;
 const uint8_t DucoPassiveCooling::PASSIVE_COOLING_CODE_OFF = 0x01;
@@ -197,24 +197,24 @@ uint8_t string_to_code_bypass_adaptive(const std::string &mode) {
 
 std::string code_to_string_heater(uint8_t mode) {
   switch (mode) {
-    case DucoHeaterMode::HEATER_CODE_ON:
-      return DucoHeaterMode::HEATER_ON;
-    case DucoHeaterMode::HEATER_CODE_OFF:
-      return DucoHeaterMode::HEATER_OFF;
+    case DucoHeaterMode::HEATER_CODE_ALLOW:
+      return DucoHeaterMode::HEATER_ALLOW;
+    case DucoHeaterMode::HEATER_CODE_REFUSE:
+      return DucoHeaterMode::HEATER_REFUSE;
     default:
-      return DucoHeaterMode::HEATER_OFF;
+      return DucoHeaterMode::HEATER_REFUSE;
   }
-  return DucoHeaterMode::HEATER_OFF;
+  return DucoHeaterMode::HEATER_REFUSE;
 }
 
 uint8_t string_to_code_heater(const std::string &mode) {
-  if (mode == DucoHeaterMode::HEATER_ON) {
-    return DucoBypassAdaptiveControl::BYPASS_ADAPTIVE_CODE_ON;
+  if (mode == DucoHeaterMode::HEATER_ALLOW) {
+    return DucoHeaterMode::HEATER_CODE_ALLOW;
   }
-  if (mode == DucoHeaterMode::HEATER_OFF) {
-    return DucoHeaterMode::HEATER_CODE_OFF;
+  if (mode == DucoHeaterMode::HEATER_REFUSE) {
+    return DucoHeaterMode::HEATER_CODE_REFUSE;
   }
-  return DucoHeaterMode::HEATER_CODE_OFF;
+  return DucoHeaterMode::HEATER_CODE_REFUSE;
 }
 
 

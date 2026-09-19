@@ -43,8 +43,8 @@ BYPASS_ADAPTIVE_OPTIONS = [
 ]
 
 HEATER_OPTIONS = [
-    "ON",
-    "OFF",
+    "ALLOW",
+    "REFUSE",
 ]
 
 PASSIVE_COOLING_OPTIONS = [

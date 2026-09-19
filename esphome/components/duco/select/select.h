@@ -104,11 +104,11 @@ class DucoBypassAdaptiveControl : public DucoDevice, public PollingComponent, pu
 
 class DucoHeaterMode : public DucoDevice, public PollingComponent, public select::Select {
  public:
-  static const std::string HEATER_ON;
-  static const std::string HEATER_OFF;
+  static const std::string HEATER_ALLOW;
+  static const std::string HEATER_REFUSE;
 
-  static const uint8_t HEATER_CODE_ON;
-  static const uint8_t HEATER_CODE_OFF;
+  static const uint8_t HEATER_CODE_ALLOW;
+  static const uint8_t HEATER_CODE_REFUSE;
 
   void setup() override;
   void update() override;
