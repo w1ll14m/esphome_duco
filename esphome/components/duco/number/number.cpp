@@ -82,7 +82,7 @@ void DucoPassiveCoolingTemperature::control(float number) {
 
   DucoMessage message;
   message.function = 0x24;
-  message.data = {0x00, 0x02, 0x03, temperature, 0x00, 0x00, 0x00};
+  message.data = {0x01, 0x02, 0x03, temperature, 0x00, 0x00, 0x00};
   this->parent_->send(message, this);
 }
 
