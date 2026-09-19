@@ -13,6 +13,7 @@ from esphome.const import (
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
     UNIT_CELSIUS,
     UNIT_PARTS_PER_MILLION,
     UNIT_PERCENT,
@@ -25,6 +26,7 @@ DEPENDENCIES = ["duco"]
 CODEOWNERS = ["@kokx"]
 
 UNIT_DAYS = "d"
+UNIT_MINUTES = "min"
 
 CONF_FILTER_REMAINING = "filter_remaining"
 CONF_FLOW_LEVEL = "flow_level"
@@ -34,6 +36,7 @@ CONF_TEMPERATURE_ODA = "temperature_oda"
 CONF_TEMPERATURE_SUP = "temperature_sup"
 CONF_TEMPERATURE_ETA = "temperature_eta"
 CONF_TEMPERATURE_EHA = "temperature_eha"
+CONF_UPTIME = "uptime"
 
 SENSOR_TYPE_ODA = 0
 SENSOR_TYPE_SUP = 1
@@ -63,6 +66,9 @@ DucoFlowLevelSensor = duco_ns.class_(
 )
 DucoStateTimeRemainingSensor = duco_ns.class_(
     "DucoStateTimeRemainingSensor", cg.PollingComponent, sensor.Sensor
+)
+DucoUptimeSensor = duco_ns.class_(
+    "DucoUptimeSensor", cg.PollingComponent, sensor.Sensor
 )
 
 CONFIG_SCHEMA = cv.Schema(
@@ -107,6 +113,21 @@ CONFIG_SCHEMA = cv.Schema(
             .extend(
                 {
                     cv.GenerateID(): cv.declare_id(DucoHumiditySensor),
+                    cv.Required(CONF_ADDRESS): cv.int_range(0, 68),
+                }
+            )
+            .extend(cv.polling_component_schema("60s"))
+        ),
+        cv.Optional(CONF_UPTIME): cv.ensure_list(
+            sensor.sensor_schema(
+                unit_of_measurement=UNIT_MINUTES,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_DURATION,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
+            )
+            .extend(
+                {
+                    cv.GenerateID(): cv.declare_id(DucoUptimeSensor),
                     cv.Required(CONF_ADDRESS): cv.int_range(0, 68),
                 }
             )
@@ -206,6 +227,14 @@ async def to_code(config):
             await sensor.register_sensor(sensvar, temperature_sensor_config)
             cg.add(sensvar.set_parent(parent))
             cg.add(sensvar.set_address(temperature_sensor_config[CONF_ADDRESS]))
+
+    if CONF_UPTIME in config:
+        for uptime_sensor_config in config[CONF_UPTIME]:
+            sensvar = cg.new_Pvariable(uptime_sensor_config[CONF_ID])
+            await cg.register_component(sensvar, uptime_sensor_config)
+            await sensor.register_sensor(sensvar, uptime_sensor_config)
+            cg.add(sensvar.set_parent(parent))
+            cg.add(sensvar.set_address(uptime_sensor_config[CONF_ADDRESS]))
 
     if CONF_FILTER_REMAINING in config:
         filter_remaining_config = config[CONF_FILTER_REMAINING]

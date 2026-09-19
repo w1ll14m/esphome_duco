@@ -63,6 +63,36 @@ void DucoHumiditySensor::receive_response(const DucoMessage &message) {
 
 void DucoHumiditySensor::set_address(uint8_t address) { this->address_ = address; }
 
+void DucoUptimeSensor::setup() {}
+
+void DucoUptimeSensor::update() {
+  DucoMessage message;
+  message.function = 0x10;
+  message.data = {0x01, address_, 0x00, 0x49, 0x04};
+  this->parent_->send(message, this);
+}
+
+float DucoUptimeSensor::get_setup_priority() const {
+  // After DUCO
+  return setup_priority::BUS - 2.0f;
+}
+
+void DucoUptimeSensor::receive_response(const DucoMessage &message) {
+  if (message.function == 0x12) {
+    if (message.data.size() >= 10) {
+      // The final word of the 0x0449 environmental block is node uptime in minutes.
+      uint16_t uptime = (message.data[9] << 8) + message.data[8];
+      publish_state(uptime);
+    } else {
+      ESP_LOGW(TAG, "Uptime response for node %u is too short", address_);
+    }
+
+    this->parent_->stop_waiting(message.id);
+  }
+}
+
+void DucoUptimeSensor::set_address(uint8_t address) { this->address_ = address; }
+
 void DucoTemperatureSensor::setup() {}
 
 void DucoTemperatureSensor::update() {
