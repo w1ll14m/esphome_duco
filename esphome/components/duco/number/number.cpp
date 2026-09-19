@@ -64,7 +64,7 @@ void DucoPassiveCoolingTemperature::receive_response(const DucoMessage &message)
   if (message.function == 0x26) {
     // ignore invalid values below below 60, range is 0-60 for passive cooling
     ESP_LOGD(TAG, "DucoPassiveCoolingTemperature: DATA %0X %0X",message.data[2],message.data[3]);
-    if (message.data[3] >= 0 && message.data[3] <= 60) {
+    if (message.data[3] <= 60) {
       publish_state(message.data[3]);
     }
     this->parent_->stop_waiting(message.id);
