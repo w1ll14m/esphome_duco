@@ -423,7 +423,7 @@ void DucoHeaterMode::control(const std::string &value) {
   }
   DucoMessage message;
   message.function = 0x24;
-  message.data = {address_,0x20, 0x0a, string_to_code_bypass_adaptive(value), 0x00, 0x00, 0x00};
+  message.data = {address_, 0x20, 0x0a, string_to_code_heater(value), 0x00, 0x00, 0x00};
   this->parent_->send(message, this);
 }
 
