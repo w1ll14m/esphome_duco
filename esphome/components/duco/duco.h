@@ -23,6 +23,8 @@ namespace duco {
 
 class DucoDevice;
 
+std::string resolve_node_type(uint8_t type_code, uint8_t network_type);
+
 class DucoMessage {
  public:
   uint8_t function{0};
@@ -130,6 +132,7 @@ class DucoDiscovery : public DucoDevice, public PollingComponent {
   static const std::string NODE_TYPE_UCBAT;
   static const std::string NODE_TYPE_UC;
   static const std::string NODE_TYPE_UCRH;
+  static const std::string NODE_TYPE_BSRH;
   static const std::string NODE_TYPE_UCCO2;
   static const std::string NODE_TYPE_VLV;
   static const std::string NODE_TYPE_VLVRH;
@@ -147,6 +150,8 @@ class DucoDiscovery : public DucoDevice, public PollingComponent {
   static const uint8_t NODE_TYPE_CODE_VLVCO2 = 16;
   static const uint8_t NODE_TYPE_CODE_BOX = 17;
   static const uint8_t NODE_TYPE_CODE_SWITCH = 18;
+  static const uint8_t NETWORK_TYPE_RF = 2;
+  static const uint8_t NETWORK_TYPE_VIRTUAL = 3;
 
  protected:
   // start with a delay of 1000 loops
@@ -154,7 +159,7 @@ class DucoDiscovery : public DucoDevice, public PollingComponent {
   uint8_t next_node_{0};
   bool waiting_for_response_ = false;
 
-  std::vector<std::tuple<uint8_t, uint8_t>> nodes_;
+  std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> nodes_;
 };
 
 #ifdef USE_TIME

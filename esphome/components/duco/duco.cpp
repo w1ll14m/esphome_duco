@@ -180,6 +180,7 @@ bool Duco::isValidString(const std::string& str) {
 const std::string DucoDiscovery::NODE_TYPE_UCBAT = "UCBAT";
 const std::string DucoDiscovery::NODE_TYPE_UC = "UC";
 const std::string DucoDiscovery::NODE_TYPE_UCRH = "UCRH";
+const std::string DucoDiscovery::NODE_TYPE_BSRH = "BSRH";
 const std::string DucoDiscovery::NODE_TYPE_UCCO2 = "UCCO2";
 const std::string DucoDiscovery::NODE_TYPE_VLV = "VLV";
 const std::string DucoDiscovery::NODE_TYPE_VLVRH = "VLVRH";
@@ -188,13 +189,15 @@ const std::string DucoDiscovery::NODE_TYPE_BOX = "BOX";
 const std::string DucoDiscovery::NODE_TYPE_SWITCH = "SWITCH";
 const std::string DucoDiscovery::NODE_TYPE_UNKNOWN = "UNKNOWN";
 
-std::string friendly_node_type(uint8_t type_code) {
+std::string resolve_node_type(uint8_t type_code, uint8_t network_type) {
   switch (type_code) {
     case DucoDiscovery::NODE_TYPE_CODE_UCBAT:
       return DucoDiscovery::NODE_TYPE_UCBAT;
     case DucoDiscovery::NODE_TYPE_CODE_UC:
       return DucoDiscovery::NODE_TYPE_UC;
     case DucoDiscovery::NODE_TYPE_CODE_UCRH:
+      if (network_type  == DucoDiscovery::NETWORK_TYPE_VIRTUAL)
+        return DucoDiscovery::NODE_TYPE_BSRH;
       return DucoDiscovery::NODE_TYPE_UCRH;
     case DucoDiscovery::NODE_TYPE_CODE_UCCO2:
       return DucoDiscovery::NODE_TYPE_UCCO2;
@@ -217,8 +220,8 @@ void DucoDiscovery::update() {
   // display all found nodes
   ESP_LOGI(TAG, "Discovered nodes:");
   for (auto &node : nodes_) {
-    ESP_LOGI(TAG, "  Node %d: type %d (%s)", std::get<0>(node), std::get<1>(node),
-             friendly_node_type(std::get<1>(node)).c_str());
+    ESP_LOGI(TAG, "  Node %d: type %d, network type %d (%s)", std::get<0>(node), std::get<1>(node),
+             std::get<2>(node), resolve_node_type(std::get<1>(node), std::get<2>(node)).c_str());
   }
 }
 
@@ -246,10 +249,12 @@ void DucoDiscovery::loop() {
 void DucoDiscovery::receive_response(const DucoMessage &message) {
   if (message.function == 0x0e) {
     this->parent_->stop_waiting(message.id);
+    ESP_LOGI(TAG, "Discovery response for node %u: %s", next_node_, message.to_string().c_str());
 
-    if (message.data[0] != 0x00) {
-      // node was found, store its information
-      nodes_.emplace_back(next_node_, message.data[0]);
+    if (message.data.size() >= 7 && message.data[0] != 0x00) {
+      // 0: Type, 1: NetworkType, 2: Addr, 3: SubAddr, 4: Parent, 5: Asso.
+      // Byte 6 is not the ConnBoard SubType field.
+      nodes_.emplace_back(next_node_, message.data[0], message.data[1]);
     }
 
     next_node_++;
