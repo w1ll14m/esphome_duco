@@ -400,7 +400,7 @@ float DucoHeaterMode::get_setup_priority() const {
 void DucoHeaterMode::receive_response(const DucoMessage &message) {
   if (message.function == 0x26 && message.data[0] == 0x01 && message.data[1] == 0x20 && message.data[2] == 0x0a) {
     // mode response received, parse it
-    auto mode = code_to_string_bypass_adaptive(message.data[3]);
+    auto mode = code_to_string_heater(message.data[3]);
 
     publish_state(mode);
 
