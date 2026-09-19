@@ -4,7 +4,6 @@ import esphome.codegen as cg
 from esphome.components import time, uart
 import esphome.config_validation as cv
 from esphome.const import (
-    CONF_DISABLE_CRC,
     CONF_DISCOVERY,
     CONF_ID,
     CONF_TIME,
@@ -22,6 +21,7 @@ DucoDiscovery = duco_ns.class_(
 DucoTime = duco_ns.class_("DucoTime", cg.PollingComponent, cg.Parented.template(Duco))
 MULTI_CONF = True
 
+CONF_DISABLE_CRC = "disable_crc"
 CONF_DUCO_ID = "duco_id"
 CONF_SEND_WAIT_TIME = "send_wait_time"
 CONF_ENABLE_ADVANCED_FEATURES = "enable_advanced_features"
