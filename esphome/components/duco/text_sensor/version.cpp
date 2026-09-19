@@ -32,9 +32,11 @@ void DucoVersion::receive_response(const DucoMessage &message) {
     uint8_t versionminor = message.data[6]; //in the duco communication print the values for minor and patch are the other way around?
     uint8_t versionpatch = message.data[5];
     std::string version;
-    // sprintf data to string
-    char buf[8];
-    sprintf(buf, "%hu.%i.%i.%i", versionmajor, versionsub, versionminor, versionpatch);
+    // snprintf data to string
+    char buf[20];
+    snprintf(buf, sizeof(buf), "%u.%u.%u.%u", static_cast<unsigned int>(versionmajor),
+             static_cast<unsigned int>(versionsub), static_cast<unsigned int>(versionminor),
+             static_cast<unsigned int>(versionpatch));
     version += buf;
 
     if (this->parent_->isValidString(version)) {
