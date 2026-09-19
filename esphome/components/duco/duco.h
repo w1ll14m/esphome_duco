@@ -25,12 +25,10 @@ class DucoDevice;
 
 class DucoMessage {
  public:
-  DucoMessage() {}
-
-  uint8_t function;
-  uint8_t id;
+  uint8_t function{0};
+  uint8_t id{0};
   std::vector<uint8_t> data;
-  uint16_t crc;
+  uint16_t crc{0};
 
   std::vector<uint8_t> get_message() {
     std::vector<uint8_t> message;
