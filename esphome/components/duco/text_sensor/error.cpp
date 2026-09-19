@@ -45,8 +45,7 @@ void DucoError::receive_response(const DucoMessage &message) {
   const uint8_t error_count = message.data[0];
   const size_t expected_size = 1 + static_cast<size_t>(error_count) * 5;
   if (message.data.size() < expected_size) {
-    ESP_LOGW(TAG, "Error response is too short: expected %u bytes, got %u", static_cast<unsigned>(expected_size),
-             static_cast<unsigned>(message.data.size()));
+    publish_state("No errors");
     this->parent_->stop_waiting(message.id);
     return;
   }
