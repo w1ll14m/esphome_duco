@@ -9,10 +9,15 @@ DEPENDENCIES = ["duco"]
 CODEOWNERS = ["@kokx"]
 
 CONF_SERIAL = "serial"
+CONF_ERROR = "error"
+CONF_UPTIME = "uptime"
+
 
 duco_ns = cg.esphome_ns.namespace("duco")
 DucoSerial = duco_ns.class_("DucoSerial", cg.PollingComponent, text_sensor.TextSensor)
 DucoVersion = duco_ns.class_("DucoVersion", cg.PollingComponent, text_sensor.TextSensor)
+DucoError = duco_ns.class_("DucoError", cg.PollingComponent, text_sensor.TextSensor)
+DucoUptime = duco_ns.class_("DucoUptime", cg.PollingComponent, text_sensor.TextSensor)
 
 CONFIG_SCHEMA = cv.Schema(
     {
@@ -33,6 +38,30 @@ CONFIG_SCHEMA = cv.Schema(
             .extend(
                 {
                     cv.GenerateID(): cv.declare_id(DucoVersion),
+                    cv.Optional(CONF_ADDRESS): cv.int_range(0, 68),
+                }
+            )
+            .extend(cv.COMPONENT_SCHEMA)
+            .extend(cv.polling_component_schema("60s"))
+            .extend(DUCO_COMPONENT_SCHEMA)
+        ),
+        cv.Optional(CONF_ERROR): cv.ensure_list(
+            text_sensor.text_sensor_schema(DucoSerial)
+            .extend(
+                {
+                    cv.GenerateID(): cv.declare_id(DucoError),
+                    cv.Optional(CONF_ADDRESS): cv.int_range(0, 68),
+                }
+            )
+            .extend(cv.COMPONENT_SCHEMA)
+            .extend(cv.polling_component_schema("60s"))
+            .extend(DUCO_COMPONENT_SCHEMA)
+        ),
+        cv.Optional(CONF_UPTIME): cv.ensure_list(
+            text_sensor.text_sensor_schema(DucoUptime)
+            .extend(
+                {
+                    cv.GenerateID(): cv.declare_id(DucoUptime),
                     cv.Optional(CONF_ADDRESS): cv.int_range(0, 68),
                 }
             )
@@ -73,3 +102,29 @@ async def to_code(config):
                 cg.add(var.set_address(text_sensor_config[CONF_ADDRESS]))
             else:
                 cg.add(var.set_address(1))
+
+    if CONF_ERROR in config:
+        for text_sensor_config in config[CONF_ERROR]:
+
+            var = cg.new_Pvariable(text_sensor_config[CONF_ID])
+            await cg.register_component(var, text_sensor_config)
+
+            await text_sensor.register_text_sensor(var, text_sensor_config)
+
+            cg.add(var.set_parent(parent))
+            if CONF_ADDRESS in text_sensor_config:
+                cg.add(var.set_address(text_sensor_config[CONF_ADDRESS]))
+            else:
+                cg.add(var.set_address(1))
+
+    if CONF_UPTIME in config:
+        for text_sensor_config in config[CONF_UPTIME]:
+            var = cg.new_Pvariable(text_sensor_config[CONF_ID])
+            await cg.register_component(var, text_sensor_config)
+            await text_sensor.register_text_sensor(var, text_sensor_config)
+            cg.add(var.set_parent(parent))
+            if CONF_ADDRESS in text_sensor_config:
+                cg.add(var.set_address(text_sensor_config[CONF_ADDRESS]))
+            else:
+                cg.add(var.set_address(1))
+
