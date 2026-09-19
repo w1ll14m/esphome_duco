@@ -149,14 +149,21 @@ CONFIG_SCHEMA = cv.Schema(
         )
         .extend({cv.GenerateID(): cv.declare_id(DucoFlowLevelSensor)})
         .extend(cv.polling_component_schema("60s")),
-        cv.Optional(CONF_TIME_REMAINING): sensor.sensor_schema(
-            unit_of_measurement=UNIT_SECOND,
-            accuracy_decimals=0,
-            device_class=DEVICE_CLASS_DURATION,
-            state_class=STATE_CLASS_MEASUREMENT,
-        )
-        .extend({cv.GenerateID(): cv.declare_id(DucoStateTimeRemainingSensor)})
-        .extend(cv.polling_component_schema("60s")),
+        cv.Optional(CONF_TIME_REMAINING): cv.ensure_list(
+            sensor.sensor_schema(
+                unit_of_measurement=UNIT_SECOND,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_DURATION,
+                state_class=STATE_CLASS_MEASUREMENT,
+            )
+            .extend(
+                {
+                    cv.GenerateID(): cv.declare_id(DucoStateTimeRemainingSensor),
+                    cv.Optional(CONF_ADDRESS): cv.int_range(0, 68),
+                }
+            )
+            .extend(cv.polling_component_schema("60s"))
+        ),
         cv.Optional(CONF_TEMPERATURE_ODA): sensor.sensor_schema(
             unit_of_measurement=UNIT_CELSIUS,
             accuracy_decimals=1,
@@ -254,11 +261,12 @@ async def to_code(config):
         cg.add(sensvar.set_parent(parent))
 
     if CONF_TIME_REMAINING in config:
-        time_remaining_config = config[CONF_TIME_REMAINING]
-        sensvar = cg.new_Pvariable(time_remaining_config[CONF_ID])
-        await cg.register_component(sensvar, time_remaining_config)
-        await sensor.register_sensor(sensvar, time_remaining_config)
-        cg.add(sensvar.set_parent(parent))
+        for time_remaining_config in config[CONF_TIME_REMAINING]:
+            sensvar = cg.new_Pvariable(time_remaining_config[CONF_ID])
+            await cg.register_component(sensvar, time_remaining_config)
+            await sensor.register_sensor(sensvar, time_remaining_config)
+            cg.add(sensvar.set_parent(parent))
+            cg.add(sensvar.set_address(time_remaining_config.get(CONF_ADDRESS, 1)))
 
     if CONF_TEMPERATURE_ODA in config:
         oda_temperature_config = config[CONF_TEMPERATURE_ODA]

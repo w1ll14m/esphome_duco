@@ -122,6 +122,10 @@ class DucoStateTimeRemainingSensor : public DucoDevice, public PollingComponent,
   float get_setup_priority() const override;
 
   void receive_response(const DucoMessage &message) override;
+  void set_address(uint8_t address);
+
+ protected:
+  uint8_t address_{1};
 };
 
 }  // namespace duco

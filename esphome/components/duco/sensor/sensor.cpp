@@ -223,10 +223,12 @@ void DucoFlowLevelSensor::receive_response(const DucoMessage &message) {
 
 void DucoStateTimeRemainingSensor::setup() {}
 
+void DucoStateTimeRemainingSensor::set_address(uint8_t address) { this->address_ = address; }
+
 void DucoStateTimeRemainingSensor::update() {
   DucoMessage message;
   message.function = 0x0c;
-  message.data = {0x02, 0x01};
+  message.data = {0x02, this->address_};
   this->parent_->send(message, this);
 }
 
