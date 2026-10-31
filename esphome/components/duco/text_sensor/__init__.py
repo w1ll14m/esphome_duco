@@ -35,7 +35,7 @@ CONFIG_SCHEMA = cv.Schema(
             .extend(DUCO_COMPONENT_SCHEMA)
         ),
         cv.Optional(CONF_VERSION): cv.ensure_list(
-            text_sensor.text_sensor_schema(DucoSerial)
+            text_sensor.text_sensor_schema(DucoVersion)
             .extend(
                 {
                     cv.GenerateID(): cv.declare_id(DucoVersion),
@@ -43,7 +43,7 @@ CONFIG_SCHEMA = cv.Schema(
                 }
             )
             .extend(cv.COMPONENT_SCHEMA)
-            .extend(cv.polling_component_schema("60s"))
+            .extend(cv.polling_component_schema("300s"))
             .extend(DUCO_COMPONENT_SCHEMA)
         ),
         cv.Optional(CONF_NODE_TYPE): cv.ensure_list(
@@ -59,7 +59,7 @@ CONFIG_SCHEMA = cv.Schema(
             .extend(DUCO_COMPONENT_SCHEMA)
         ),
         cv.Optional(CONF_ERROR): cv.ensure_list(
-            text_sensor.text_sensor_schema(DucoSerial)
+            text_sensor.text_sensor_schema(DucoError)
             .extend(
                 {
                     cv.GenerateID(): cv.declare_id(DucoError),
